@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    container_name: ar_app
+    shm_size: 4096m
+    build: "./application"
+    ports:
+      - '8015:8080'
+      - '8050:8050'
+      - '5005:5005'
+
+    volumes:
+      - "./application:/app"
+      - "./sys/fs/cgroup:/sys/fs/cgroup:ro"
+      - "./work:/work"
+    environment:
+      TZ: 'Asia/Tokyo'
+      GRADLE_OPTS: '-Dorg.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005'
+    working_dir: /app
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    tty: true
+    networks:
+      - shared_network
+  
+networks:
+  shared_network:
+    external: true
+    
+    
